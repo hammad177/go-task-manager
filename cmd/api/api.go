@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/hammad177/task_management/modules/projects"
+	"github.com/hammad177/task_management/modules/tasks"
 )
 
 type APIServer struct {
@@ -25,7 +27,15 @@ func (s *APIServer) Run() error {
 
 	subRouter := router.PathPrefix("/api/v1").Subrouter()
 
+	projectsStore := projects.NewStore(s.db)
+	projectsHandler := projects.NewHandler(projectsStore)
+	projectsHandler.RegisterRoutes(subRouter)
+
+	taskStore := tasks.NewStore(s.db)
+	taskHandler := tasks.NewHandler(taskStore)
+	taskHandler.RegisterRoutes(subRouter)
+
 	log.Println("Listening on", s.addr)
 
-	return http.ListenAndServe(s.addr, subRouter)
+	return http.ListenAndServe(s.addr, router)
 }
