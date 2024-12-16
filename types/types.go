@@ -11,6 +11,10 @@ type ProjectStore interface {
 
 type TaskStore interface {
 	CreateTask(payload CreateTaskPayload) error
+	GetTasks() ([]Task, error)
+	GetTaskById(id int) (*Task, error)
+	UpdateTaskById(id int, payload UpdateTaskPayload) error
+	DeleteTaskById(id int) error
 }
 
 // database models types
@@ -50,9 +54,17 @@ type CreateProjectPayload struct {
 type UpdateProjectPayload struct {
 	BaseProjectPayload
 }
-type CreateTaskPayload struct {
+type BaseTaskPayload struct {
 	Name       string `json:"name" validate:"required"`
 	Status     string `json:"status" validate:"required"`
 	ProjectID  int    `json:"project_id" validate:"required"`
 	AssignedTo int    `json:"assigned_to" validate:"required"`
+}
+
+type CreateTaskPayload struct {
+	BaseTaskPayload
+}
+
+type UpdateTaskPayload struct {
+	BaseTaskPayload
 }
