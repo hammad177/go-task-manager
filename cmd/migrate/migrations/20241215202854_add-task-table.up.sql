@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     `assigned_to` INT UNSIGNED NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
     FOREIGN KEY (project_id) REFERENCES projects(id),
     FOREIGN KEY (assigned_to) REFERENCES users(id)
 );
