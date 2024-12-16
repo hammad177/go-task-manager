@@ -67,6 +67,38 @@ func (s *Store) GetProjectById(id int) (*types.Project, error) {
 	return p, nil
 }
 
+func (s *Store) UpdateProjectById(id int, payload types.UpdateProjectPayload) error {
+	_, err1 := s.GetProjectById(id)
+
+	if err1 != nil {
+		return err1
+	}
+
+	_, err2 := s.db.Exec("UPDATE projects SET name = ?, description = ? WHERE id = ?", payload.Name, payload.Description, id)
+
+	if err2 != nil {
+		return err2
+	}
+
+	return nil
+}
+
+func (s *Store) DeleteProjectById(id int) error {
+	_, err1 := s.GetProjectById(id)
+
+	if err1 != nil {
+		return err1
+	}
+
+	_, err2 := s.db.Exec("DELETE FROM projects WHERE id = ?", id)
+
+	if err2 != nil {
+		return err2
+	}
+
+	return nil
+}
+
 func scanRowsIntoProject(rows *sql.Rows) (*types.Project, error) {
 	p := new(types.Project)
 	err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.CreatedAt)

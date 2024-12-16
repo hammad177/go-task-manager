@@ -5,6 +5,8 @@ type ProjectStore interface {
 	CreateProject(payload CreateProjectPayload) error
 	GetProjects() ([]Project, error)
 	GetProjectById(id int) (*Project, error)
+	UpdateProjectById(id int, payload UpdateProjectPayload) error
+	DeleteProjectById(id int) error
 }
 
 type TaskStore interface {
@@ -36,11 +38,18 @@ type User struct {
 }
 
 // http request payload types
-type CreateProjectPayload struct {
+type BaseProjectPayload struct {
 	Name        string `json:"name" validate:"required"`
 	Description string `json:"description" validate:"required"`
 }
 
+type CreateProjectPayload struct {
+	BaseProjectPayload
+}
+
+type UpdateProjectPayload struct {
+	BaseProjectPayload
+}
 type CreateTaskPayload struct {
 	Name       string `json:"name" validate:"required"`
 	Status     string `json:"status" validate:"required"`
