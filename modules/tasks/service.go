@@ -23,8 +23,15 @@ func (h *Handler) createTaskService(payload types.CreateTaskPayload) (any, error
 	return nil, nil
 }
 
-func (h *Handler) getTaskService() (any, error) {
-	tasks, err := h.store.GetTasks()
+func (h *Handler) getTaskService(isDetailed bool) (any, error) {
+	var tasks any
+	var err error
+
+	if isDetailed {
+		tasks, err = h.store.GetTasksDetails()
+	} else {
+		tasks, err = h.store.GetTasks()
+	}
 
 	if err != nil {
 		return nil, err
@@ -33,14 +40,21 @@ func (h *Handler) getTaskService() (any, error) {
 	return tasks, nil
 }
 
-func (h *Handler) getTaskByIdService(id int) (any, error) {
-	tasks, err := h.store.GetTaskById(id)
+func (h *Handler) getTaskByIdService(id int, isDetailed bool) (any, error) {
+	var task any
+	var err error
+
+	if isDetailed {
+		task, err = h.store.GetTaskDetailsById(id)
+	} else {
+		task, err = h.store.GetTaskById(id)
+	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	return tasks, nil
+	return task, nil
 }
 
 func (h *Handler) updateTaskService(id int, payload types.UpdateTaskPayload) (any, error) {

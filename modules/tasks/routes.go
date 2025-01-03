@@ -43,7 +43,11 @@ func (h *Handler) createTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) getTasks(w http.ResponseWriter, r *http.Request) {
-	body, err := h.getTaskService()
+	detailed := r.URL.Query().Get("detailed")
+
+	isDetailed := detailed == "true"
+
+	body, err := h.getTaskService(isDetailed)
 
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
@@ -57,12 +61,16 @@ func (h *Handler) getTaskById(w http.ResponseWriter, r *http.Request) {
 	// get the task ID from the URL
 	taskID, err := utils.GetURLParams(r, "task_id")
 
+	detailed := r.URL.Query().Get("detailed")
+
+	isDetailed := detailed == "true"
+
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	body, err := h.getTaskByIdService(*taskID)
+	body, err := h.getTaskByIdService(*taskID, isDetailed)
 
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)

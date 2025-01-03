@@ -46,6 +46,38 @@ func (s *Store) GetTasks() ([]types.Task, error) {
 	return tasks, nil
 }
 
+func (s *Store) GetTasksDetails() ([]types.TaskDetails, error) {
+	query := `
+		SELECT 
+			t.id, t.name, t.status, t.created_at, 
+			u.username, u.email as user_email,
+			p.name as project_name, p.description as project_description
+		FROM 
+			tasks t
+		LEFT JOIN 
+			users u ON t.assigned_to = u.id
+		LEFT JOIN 
+			projects p ON t.project_id = p.id
+	`
+
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	tasks := make([]types.TaskDetails, 0)
+
+	for rows.Next() {
+		t, err := scanRowsIntoTasksDetails(rows)
+		if err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, *t)
+	}
+
+	return tasks, nil
+}
+
 func (s *Store) GetTaskById(id int) (*types.Task, error) {
 	rows, err := s.db.Query("SELECT * FROM tasks WHERE id = ?", id)
 	if err != nil {
@@ -65,6 +97,41 @@ func (s *Store) GetTaskById(id int) (*types.Task, error) {
 	}
 
 	return p, nil
+}
+
+func (s *Store) GetTaskDetailsById(id int) (*types.TaskDetails, error) {
+	query := `
+		SELECT 
+			t.id, t.name, t.status, t.created_at, 
+			u.username, u.email as user_email,
+			p.name as project_name, p.description as project_description
+		FROM 
+			tasks t
+		LEFT JOIN 
+			users u ON t.assigned_to = u.id
+		LEFT JOIN 
+			projects p ON t.project_id = p.id
+		WHERE 
+			t.id = ?
+	`
+
+	rows, err := s.db.Query(query, id)
+	if err != nil {
+		return nil, err
+	}
+	t := new(types.TaskDetails)
+	for rows.Next() {
+		t, err = scanRowsIntoTasksDetails(rows)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if t.ID == 0 {
+		return nil, fmt.Errorf("task not found")
+	}
+
+	return t, nil
 }
 
 func (s *Store) UpdateTaskById(id int, payload types.UpdateTaskPayload) error {
@@ -102,6 +169,15 @@ func (s *Store) DeleteTaskById(id int) error {
 func scanRowsIntoTasks(rows *sql.Rows) (*types.Task, error) {
 	t := new(types.Task)
 	err := rows.Scan(&t.ID, &t.Name, &t.Status, &t.ProjectID, &t.AssignedTo, &t.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return t, nil
+}
+
+func scanRowsIntoTasksDetails(rows *sql.Rows) (*types.TaskDetails, error) {
+	t := new(types.TaskDetails)
+	err := rows.Scan(&t.ID, &t.Name, &t.Status, &t.CreatedAt, &t.Username, &t.UserEmail, &t.ProjectName, &t.ProjectDescription)
 	if err != nil {
 		return nil, err
 	}

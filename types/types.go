@@ -12,7 +12,9 @@ type ProjectStore interface {
 type TaskStore interface {
 	CreateTask(payload CreateTaskPayload) error
 	GetTasks() ([]Task, error)
+	GetTasksDetails() ([]TaskDetails, error)
 	GetTaskById(id int) (*Task, error)
+	GetTaskDetailsById(id int) (*TaskDetails, error)
 	UpdateTaskById(id int, payload UpdateTaskPayload) error
 	DeleteTaskById(id int) error
 }
@@ -48,6 +50,17 @@ type User struct {
 	Email     string `json:"email"`
 	Role      string `json:"role"`
 	CreatedAt string `json:"created_at"`
+}
+
+type TaskDetails struct {
+	ID                 int    `json:"id"`
+	Name               string `json:"name"`
+	Status             string `json:"status"`
+	CreatedAt          string `json:"created_at"`
+	Username           string `json:"username"`
+	UserEmail          string `json:"user_email"`
+	ProjectName        string `json:"project_name"`
+	ProjectDescription string `json:"project_description"`
 }
 
 // http request payload types
