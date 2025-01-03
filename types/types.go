@@ -17,6 +17,14 @@ type TaskStore interface {
 	DeleteTaskById(id int) error
 }
 
+type UserStore interface {
+	CreateUser(payload CreateUserPayload) error
+	GetUsers() ([]User, error)
+	GetUserById(id int) (*User, error)
+	UpdateUserById(id int, payload UpdateUserPayload) error
+	DeleteUserById(id int) error
+}
+
 // database models types
 type Project struct {
 	ID          int    `json:"id"`
@@ -35,10 +43,11 @@ type Task struct {
 }
 
 type User struct {
-	ID       int    `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	ID        int    `json:"id"`
+	Username  string `json:"username"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
+	CreatedAt string `json:"created_at"`
 }
 
 // http request payload types
@@ -67,4 +76,17 @@ type CreateTaskPayload struct {
 
 type UpdateTaskPayload struct {
 	BaseTaskPayload
+}
+
+type BaseUserPayload struct {
+	Username string `json:"username" validate:"required"`
+	Email    string `json:"email" validate:"required"`
+}
+
+type CreateUserPayload struct {
+	BaseUserPayload
+}
+
+type UpdateUserPayload struct {
+	BaseUserPayload
 }
